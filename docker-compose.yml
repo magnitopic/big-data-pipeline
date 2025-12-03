@@ -1,0 +1,17 @@
+services:
+  mariadb:
+    container_name: mariadb
+    build:
+        context: ./mariadb/.
+    image: mariadb
+    networks:
+        - network
+    restart: always
+    env_file: .env
+    expose:
+        - "3306"
+
+networks:
+  network:
+    name: network
+    driver: bridge
