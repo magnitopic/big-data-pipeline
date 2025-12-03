@@ -30,7 +30,7 @@ Crear el diagrama de arquitectura (Draw.io / Miro).
 Crear el catálogo inicial de datasets (columnas + diccionario básico).
 
 
-BLOQUE 2 — INGESTA (NiFi)
+BLOQUE 2 — INGESTA (NiFi) (Hugo)
 Tareas
 Configurar Flow NiFi para leer delays_history_agg.csv.
 
