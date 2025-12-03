@@ -8,8 +8,8 @@ services:
         - network
     restart: always
     env_file: .env
-    expose:
-        - "3306"
+    ports:
+        - "3306:3306"
 
   nifi:
     container_name: nifi
@@ -41,6 +41,26 @@ services:
         - nifi-logs:/opt/nifi/nifi-current/logs
         - ./data:/opt/nifi/data
 
+  mongodb:
+    container_name: mongodb
+    build:
+        context: ./Docker/mongodb/.
+    image: mongodb
+    hostname: mongodb
+    networks:
+        - network
+    restart: always
+    env_file: .env
+    ports:
+        - "27017:27017"
+    environment:
+        MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+        MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+        MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-flight_delays}
+    volumes:
+        - mongodb-data:/data/db
+        - mongodb-config:/data/configdb
+
 volumes:
   nifi-conf:
   nifi-database:
@@ -49,6 +69,8 @@ volumes:
   nifi-provenance:
   nifi-state:
   nifi-logs:
+  mongodb-data:
+  mongodb-config:
 
 networks:
   network:
