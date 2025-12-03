@@ -1,13 +1,14 @@
 ## ALEX
 
 -   Montrar entorno docker.
+
     -   Crear entorno con todos los contenedores y estrucutra de Docker.
     -   Configurar servicios
     -   Entorno y secretos
 
-- Installar pyspark
-	- Crear entorno Python
-	- Crear script de python que lea datos de la api
+-   Installar pyspark
+    -   Crear entorno Python
+    -   Crear script de python que lea datos de la api
 
 ## Hugo
 
@@ -15,19 +16,6 @@
 
     -   Crear cuenta y registrase en los diferentes servicios que vamos a usar
     -   Guardar tokes y otra información en el fichero `.env`
-
--   NiFi
-    -   Acceder a NiFi (puerto 8443)
-    -   Crear primer flow: Leer CSV -> parsear -> print
-    -   Segundo flow: usar api de OpenSky -> parsear JSON -> print
-
-## Nacho
-
--   Base de datos
-
-    -   Para MySQL, Cassandra y MongoDB
-    -   Crear eschemas para cada tipo de dato
-	-   Crear tablas para cada tipo de dato
 
 -   Crear diagrama de arquitectura
     -   Crear diagrama de arquitectura Kappa. Mostrar:
@@ -37,3 +25,16 @@
             -   Procesamiento con Flink
             -   Capa de almacenamiento (HDFS, MySQL, Cassandra/MongoDB)
             -   Conexión con Power BI
+
+## Nacho
+
+-   Base de datos
+
+    -   Para MySQL, Cassandra y MongoDB
+    -   Crear eschemas para cada tipo de dato
+    -   Crear tablas para cada tipo de dato
+
+-   NiFi
+    -   Acceder a NiFi (puerto 8443)
+    -   Crear primer flow: Leer CSV -> parsear -> print
+    -   Segundo flow: usar api de OpenSky -> parsear JSON -> print
