@@ -417,3 +417,5 @@ Puntos clave:
 - Proporciona datos meteorológicos históricos diarios y horarios a partir de múltiples fuentes (incluida NOAA).
 - Permite construir de forma automatizada `weather_history.csv` para los aeropuertos y años elegidos.
 - Útil como fuente batch para el ejercicio y como referencia para validar datos procedentes de otras APIs.
+
+
