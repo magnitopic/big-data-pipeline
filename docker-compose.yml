@@ -226,6 +226,54 @@ services:
     depends_on:
         - hdfs-namenode
 
+  flink-jobmanager:
+    container_name: flink-jobmanager
+    build:
+        context: ./Docker/flink/.
+    image: flink
+    hostname: flink-jobmanager
+    networks:
+        - network
+    restart: always
+    env_file: .env
+    ports:
+        - "8083:8081"   # Flink Web UI
+        - "6123:6123"   # Flink RPC
+        - "9249:9249"   # Prometheus metrics
+    environment:
+        FLINK_MODE: jobmanager
+        FLINK_JOBMANAGER_RPC_PORT: 6123
+        FLINK_PROPERTIES: |
+            jobmanager.rpc.address: flink-jobmanager
+    volumes:
+        - flink-apps:/opt/flink-apps
+        - flink-data:/opt/flink-data
+        - ./data:/data
+
+  flink-taskmanager:
+    container_name: flink-taskmanager
+    build:
+        context: ./Docker/flink/.
+    image: flink
+    hostname: flink-taskmanager
+    networks:
+        - network
+    restart: always
+    env_file: .env
+    environment:
+        FLINK_MODE: taskmanager
+        FLINK_JOBMANAGER_HOST: flink-jobmanager
+        FLINK_JOBMANAGER_RPC_PORT: 6123
+        FLINK_PROPERTIES: |
+            jobmanager.rpc.address: flink-jobmanager
+            taskmanager.numberOfTaskSlots: 2
+    volumes:
+        - flink-apps:/opt/flink-apps
+        - flink-data:/opt/flink-data
+        - ./data:/data
+    depends_on:
+        - flink-jobmanager
+
 volumes:
   nifi-conf:
   nifi-database:
@@ -244,6 +292,8 @@ volumes:
   cassandra-data:
   hdfs-namenode:
   hdfs-datanode:
+  flink-apps:
+  flink-data:
 
 networks:
   network:
