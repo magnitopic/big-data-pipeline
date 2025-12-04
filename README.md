@@ -35,3 +35,10 @@ mysql://localhost:3306
 ```
 mongodb://localhost:27017
 ```
+
+
+### HDFS
+
+```
+hdfs://localhost:8020
+```

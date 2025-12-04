@@ -11,6 +11,53 @@ services:
     ports:
         - "3306:3306"
 
+  cassandra:
+    container_name: cassandra
+    build:
+        context: ./Docker/cassandra/.
+    image: cassandra
+    hostname: cassandra
+    networks:
+        - network
+    restart: always
+    env_file: .env
+    ports:
+        - "9042:9042"   # CQL native transport
+        - "9160:9160"   # Thrift client API
+    environment:
+        CASSANDRA_CLUSTER_NAME: flight_delays_cluster
+        CASSANDRA_DC: dc1
+        CASSANDRA_RACK: rack1
+        CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
+        CASSANDRA_NUM_TOKENS: 256
+    volumes:
+        - cassandra-data:/var/lib/cassandra
+    healthcheck:
+        test: ["CMD", "cqlsh", "-e", "describe keyspaces"]
+        interval: 30s
+        timeout: 10s
+        retries: 5
+
+  mongodb:
+    container_name: mongodb
+    build:
+        context: ./Docker/mongodb/.
+    image: mongodb
+    hostname: mongodb
+    networks:
+        - network
+    restart: always
+    env_file: .env
+    ports:
+        - "27017:27017"
+    environment:
+        MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+        MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+        MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-flight_delays}
+    volumes:
+        - mongodb-data:/data/db
+        - mongodb-config:/data/configdb
+
   nifi:
     container_name: nifi
     build:
@@ -40,26 +87,6 @@ services:
         - nifi-state:/opt/nifi/nifi-current/state
         - nifi-logs:/opt/nifi/nifi-current/logs
         - ./data:/opt/nifi/data
-
-  mongodb:
-    container_name: mongodb
-    build:
-        context: ./Docker/mongodb/.
-    image: mongodb
-    hostname: mongodb
-    networks:
-        - network
-    restart: always
-    env_file: .env
-    ports:
-        - "27017:27017"
-    environment:
-        MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
-        MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
-        MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-flight_delays}
-    volumes:
-        - mongodb-data:/data/db
-        - mongodb-config:/data/configdb
 
   kafka:
     container_name: kafka
@@ -157,32 +184,47 @@ services:
     depends_on:
         - spark-master
 
-  cassandra:
-    container_name: cassandra
+  hdfs-namenode:
+    container_name: hdfs-namenode
     build:
-        context: ./Docker/cassandra/.
-    image: cassandra
-    hostname: cassandra
+        context: ./Docker/hdfs/.
+    image: hdfs
+    hostname: hdfs-namenode
     networks:
         - network
     restart: always
     env_file: .env
     ports:
-        - "9042:9042"   # CQL native transport
-        - "9160:9160"   # Thrift client API
+        - "9870:9870"   # NameNode Web UI
+        - "8020:8020"   # NameNode RPC
     environment:
-        CASSANDRA_CLUSTER_NAME: flight_delays_cluster
-        CASSANDRA_DC: dc1
-        CASSANDRA_RACK: rack1
-        CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
-        CASSANDRA_NUM_TOKENS: 256
+        HADOOP_NAMENODE_OPTS: "-Dhadoop.security.logger=INFO,RFAS"
+    command: hdfs namenode
     volumes:
-        - cassandra-data:/var/lib/cassandra
-    healthcheck:
-        test: ["CMD", "cqlsh", "-e", "describe keyspaces"]
-        interval: 30s
-        timeout: 10s
-        retries: 5
+        - hdfs-namenode:/hadoop/dfs/name
+        - ./data:/data
+
+  hdfs-datanode:
+    container_name: hdfs-datanode
+    build:
+        context: ./Docker/hdfs/.
+    image: hdfs
+    hostname: hdfs-datanode
+    networks:
+        - network
+    restart: always
+    env_file: .env
+    ports:
+        - "9864:9864"   # DataNode Web UI
+        - "9866:9866"   # DataNode data transfer
+    environment:
+        HADOOP_DATANODE_OPTS: "-Dhadoop.security.logger=ERROR,RFAS"
+    command: hdfs datanode
+    volumes:
+        - hdfs-datanode:/hadoop/dfs/data
+        - ./data:/data
+    depends_on:
+        - hdfs-namenode
 
 volumes:
   nifi-conf:
@@ -200,6 +242,8 @@ volumes:
   spark-apps:
   spark-data:
   cassandra-data:
+  hdfs-namenode:
+  hdfs-datanode:
 
 networks:
   network:
