@@ -50,7 +50,7 @@ Preparar pipeline NiFi vacío para futuras llamadas a OpenWeather.
 Exportar template NiFi del flujo actual.
 
 
-BLOQUE 3 — KAFKA (Infraestructura base)
+BLOQUE 3 — KAFKA (Infraestructura base) (Hugo)
 Tareas
 Crear los topics:
 
