@@ -38,3 +38,36 @@
     -   Acceder a NiFi (puerto 8443)
     -   Crear primer flow: Leer CSV -> parsear -> print
     -   Segundo flow: usar api de OpenSky -> parsear JSON -> print
+
+## General
+
+**Configuración de NiFi:**
+
+-   Crear flujo para leer archivos CSV → Kafka
+-   Crear flujo para consultar la API de OpenSky → Kafka
+-   Crear flujo para consultar la API de OpenWeather → Kafka
+
+> Utilizar Nifi tempalates y exportar para poder automatizar
+
+**Creación de temas en Kafka (ya realizado):**
+
+-   flight-events
+-   weather-events
+-   enriched-events
+-   kpi-results
+
+**Elegir un enfoque de procesamiento:**
+
+-   Flink (procesamiento en streaming) **O**
+-   Spark Structured Streaming
+
+**Configuración de almacenamiento:**
+
+-   **MariaDB:** Crear tablas para agregaciones históricas
+-   **MongoDB:** Ya tiene colecciones listas
+
+**Prueba del flujo de datos:**
+
+-   Cargar un CSV → NiFi → Kafka → verificar en el tópico de Kafka
+-   Consultar API → NiFi → Kafka → verificar
+-   Procesar en Flink/Spark → escribir en la base de datos → verificar en MongoDB
