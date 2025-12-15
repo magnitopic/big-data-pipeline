@@ -2,19 +2,17 @@ FROM confluentinc/cp-kafka:7.5.0
 
 USER root
 
-# Install additional tools
+# Herramientas útiles
 RUN microdnf install -y \
     procps \
     net-tools \
     && microdnf clean all
 
-# Create topics directory
-RUN mkdir -p /etc/kafka/topics
-
-# Copy initialization script
+# Copiar script de inicialización
 COPY ./script/init-kafka.sh /etc/kafka/init-kafka.sh
+
+# Permisos correctos
 RUN chmod +x /etc/kafka/init-kafka.sh
 
-USER appuser
-
-CMD ["/etc/kafka/init-kafka.sh"]
+# Ejecutar como root (evita errores de permisos)
+CMD ["/bin/bash", "/etc/kafka/init-kafka.sh"]
