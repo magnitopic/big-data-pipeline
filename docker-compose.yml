@@ -65,36 +65,6 @@ services:
     depends_on:
       - zookeeper
 
-
-  #####################################################################
-  # 💤 BASES DE DATOS — DESACTIVADAS (ACTIVAR SOLO SI SE USAN)
-  #####################################################################
-
-  # mariadb:
-  #   container_name: mariadb
-  #   build:
-  #     context: ./Docker/mariadb/.
-  #   image: mariadb
-  #   networks:
-  #     - network
-  #   restart: always
-  #   env_file: .env
-  #   ports:
-  #     - "3306:3306"
-
-  # mongodb:
-  #   container_name: mongodb
-  #   build:
-  #     context: ./Docker/mongodb/.
-  #   image: mongodb
-  #   hostname: mongodb
-  #   networks:
-  #     - network
-  #   restart: always
-  #   env_file: .env
-  #   ports:
-  #     - "27017:27017"
-
   cassandra:
     container_name: cassandra
     build:
@@ -109,105 +79,6 @@ services:
     volumes:
       - cassandra-data:/var/lib/cassandra
 
-
-  #####################################################################
-  # ✅ SPARK — ACTIVADO
-  #####################################################################
-  spark-master:
-    container_name: spark-master
-    build:
-      context: ./Docker/spark/.
-    image: spark
-    hostname: spark-master
-    networks:
-      - network
-    restart: always
-    ports:
-      - "7077:7077"
-      - "8081:8080"
-    environment:
-      SPARK_MODE: master
-
-  spark-worker:
-    container_name: spark-worker
-    build:
-      context: ./Docker/spark/.
-    image: spark
-    hostname: spark-worker
-    networks:
-      - network
-    restart: always
-    ports:
-      - "8082:8081"
-    environment:
-      SPARK_MODE: worker
-      SPARK_MASTER_URL: spark://spark-master:7077
-    depends_on:
-      - spark-master
-
-
-
-  #####################################################################
-  # 💤 HDFS — DESACTIVADO (ACTIVAR SOLO SI REALMENTE SE USA)
-  #####################################################################
-
-  # hdfs-namenode:
-  #   container_name: hdfs-namenode
-  #   build:
-  #     context: ./Docker/hdfs/.
-  #   image: hdfs
-  #   hostname: hdfs-namenode
-  #   networks:
-  #     - network
-  #   restart: always
-  #   ports:
-  #     - "9870:9870"
-  #     - "8020:8020"
-
-  # hdfs-datanode:
-  #   container_name: hdfs-datanode
-  #   build:
-  #     context: ./Docker/hdfs/.
-  #   image: hdfs
-  #   hostname: hdfs-datanode
-  #   networks:
-  #     - network
-  #   restart: always
-  #   ports:
-  #     - "9864:9864"
-  #   depends_on:
-  #     - hdfs-namenode
-
-
-  #####################################################################
-  # 💤 FLINK — DESACTIVADO (ACTIVAR PARA STREAM PROCESSING)
-  #####################################################################
-
-  # flink-jobmanager:
-  #   container_name: flink-jobmanager
-  #   build:
-  #     context: ./Docker/flink/.
-  #   image: flink
-  #   hostname: flink-jobmanager
-  #   networks:
-  #     - network
-  #   restart: always
-  #   ports:
-  #     - "8083:8081"
-  #     - "6123:6123"
-
-  # flink-taskmanager:
-  #   container_name: flink-taskmanager
-  #   build:
-  #     context: ./Docker/flink/.
-  #   image: flink
-  #   hostname: flink-taskmanager
-  #   networks:
-  #     - network
-  #   restart: always
-  #   depends_on:
-  #     - flink-jobmanager
-
 volumes:
   nifi-conf:
   nifi-database:
@@ -216,18 +87,10 @@ volumes:
   nifi-provenance:
   nifi-state:
   nifi-logs:
-  mongodb-data:
-  mongodb-config:
   kafka-data:
   zookeeper-data:
   zookeeper-logs:
-  spark-apps:
-  spark-data:
   cassandra-data:
-  hdfs-namenode:
-  hdfs-datanode:
-  flink-apps:
-  flink-data:
 
 networks:
   network:
