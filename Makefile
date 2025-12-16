@@ -1,3 +1,6 @@
+spark:
+	@echo "Submitting ETL job to Spark master..."
+	docker exec -it spark-master /opt/spark/bin/spark-submit --master spark://spark-master:7077 /opt/spark-apps/pysparkConnector.py
 # INCLUDES #
 include .env
 

@@ -1,6 +1,6 @@
 """
 Spark ETL Pipeline for Flight Delays Analysis
-Processes CSV files and loads transformed data into MariaDB for Power BI
+Reads CSVs from ./data, transforms them, and writes to Cassandra.
 """
 
 from pyspark.sql import SparkSession
@@ -11,46 +11,45 @@ from pyspark.sql.functions import (
 )
 from pyspark.sql.types import DoubleType, IntegerType
 import sys
+import os
 
-# Configuration
-MARIADB_HOST = "localhost"  # Change to your MariaDB container name
-MARIADB_PORT = "3306"
-MARIADB_DB = "flight_delays"
-MARIADB_USER = "root"
-MARIADB_PASSWORD = "your_password"  # Update this
-
-# JDBC URL
-JDBC_URL = f"jdbc:mysql://{MARIADB_HOST}:{MARIADB_PORT}/{MARIADB_DB}?useSSL=false&allowPublicKeyRetrieval=true"
+# Cassandra configuration
+CASSANDRA_HOST = os.getenv("CASSANDRA_HOST", "cassandra")
+CASSANDRA_PORT = os.getenv("CASSANDRA_PORT", "9042")
+CASSANDRA_KEYSPACE = os.getenv("CASSANDRA_KEYSPACE", "flight_delays")
 
 # Data paths
-DATA_DIR = "/workspace/data"
+# Default to container path "/data"; allow override for local WSL runs via env.
+DATA_DIR = os.getenv("DATA_DIR", "/data")
 AIRLINE_DELAY_FILE = f"{DATA_DIR}/Airline_Delay_Cause.csv"
 DELAYS_AGG_FILE = f"{DATA_DIR}/delays_history_agg.csv"
 DELAYS_SAMPLE_FILE = f"{DATA_DIR}/delays_history_sample.csv"
 
 
 def create_spark_session():
-    """Initialize Spark session with MySQL connector"""
-    return SparkSession.builder \
-        .appName("FlightDelaysETL") \
-        .config("spark.jars", "/opt/spark/jars/mysql-connector-java-8.0.28.jar") \
-        .config("spark.driver.memory", "2g") \
-        .config("spark.executor.memory", "2g") \
-        .getOrCreate()
+    """Initialize Spark session with Cassandra connector and optional master override"""
+    builder = (
+        SparkSession.builder
+        .appName("FlightDelaysETL")
+        .config("spark.driver.memory", "2g")
+        .config("spark.executor.memory", "2g")
+        .config("spark.cassandra.connection.host", CASSANDRA_HOST)
+        .config("spark.cassandra.connection.port", CASSANDRA_PORT)
+    )
+    master = os.getenv("SPARK_MASTER_URL")
+    if master:
+        builder = builder.master(master)
+    return builder.getOrCreate()
 
 
-def write_to_mysql(df, table_name, mode="overwrite"):
-    """Write DataFrame to MySQL table"""
-    df.write \
-        .format("jdbc") \
-        .option("url", JDBC_URL) \
-        .option("dbtable", table_name) \
-        .option("user", MARIADB_USER) \
-        .option("password", MARIADB_PASSWORD) \
-        .option("driver", "com.mysql.cj.jdbc.Driver") \
-        .mode(mode) \
-        .save()
-    print(f"✓ Written {df.count()} rows to table: {table_name}")
+def write_to_cassandra(df, table_name, mode="append"):
+    """Write DataFrame to Cassandra table in the configured keyspace"""
+    (df.write
+        .format("org.apache.spark.sql.cassandra")
+        .options(keyspace=CASSANDRA_KEYSPACE, table=table_name)
+        .mode(mode)
+        .save())
+    print(f"✓ Written {df.count()} rows to Cassandra table: {table_name}")
 
 
 def load_and_clean_airline_delays(spark):
@@ -335,7 +334,7 @@ def create_data_quality_report(df_original, df_clean, dataset_name):
 def main():
     """Main ETL pipeline"""
     print("=" * 60)
-    print("FLIGHT DELAYS ETL PIPELINE")
+    print("FLIGHT DELAYS ETL PIPELINE → Cassandra")
     print("=" * 60)
     
     # Initialize Spark
@@ -349,38 +348,38 @@ def main():
         
         # Create fact table
         fact_delays = create_fact_delays(df_airline_delays)
-        write_to_mysql(fact_delays, "fact_flight_delays")
-        
+        write_to_cassandra(fact_delays, "fact_flight_delays")
+
         # Create dimension tables
         dim_airports = create_dim_airports(df_airline_delays)
-        write_to_mysql(dim_airports, "dim_airports")
+        write_to_cassandra(dim_airports, "dim_airports")
         
         dim_airlines = create_dim_airlines(df_airline_delays)
-        write_to_mysql(dim_airlines, "dim_airlines")
+        write_to_cassandra(dim_airlines, "dim_airlines")
         
-        # Create aggregated tables for Power BI
+        # Create aggregated tables for analytics
         agg_airport = create_agg_airport_performance(df_airline_delays)
-        write_to_mysql(agg_airport, "agg_airport_performance")
+        write_to_cassandra(agg_airport, "agg_airport_performance")
         
         agg_airline = create_agg_airline_performance(df_airline_delays)
-        write_to_mysql(agg_airline, "agg_airline_performance")
+        write_to_cassandra(agg_airline, "agg_airline_performance")
         
         agg_monthly = create_agg_monthly_trends(df_airline_delays)
-        write_to_mysql(agg_monthly, "agg_monthly_trends")
+        write_to_cassandra(agg_monthly, "agg_monthly_trends")
         
         agg_causes = create_agg_delay_causes(df_airline_delays)
-        write_to_mysql(agg_causes, "agg_delay_causes")
+        write_to_cassandra(agg_causes, "agg_delay_causes")
         
         agg_routes = create_agg_route_analysis(df_sample)
-        write_to_mysql(agg_routes, "agg_route_analysis")
+        write_to_cassandra(agg_routes, "agg_route_analysis")
         
         # Write sample data
-        write_to_mysql(df_sample, "fact_flight_samples")
+        write_to_cassandra(df_sample, "fact_flight_samples")
         
         print("\n" + "=" * 60)
-        print("ETL PIPELINE COMPLETED SUCCESSFULLY")
+        print("ETL PIPELINE COMPLETED SUCCESSFULLY (Cassandra)")
         print("=" * 60)
-        print("\nTables created in MariaDB:")
+        print("\nTables created in Cassandra:")
         print("  - fact_flight_delays (main fact table)")
         print("  - fact_flight_samples (individual flights)")
         print("  - dim_airports (airport dimension)")
