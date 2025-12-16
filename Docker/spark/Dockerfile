@@ -13,10 +13,9 @@ RUN apt-get update && apt-get install -y \
 # Create directories for Spark applications and data
 RUN mkdir -p /opt/spark-apps /opt/spark-data
 
-# Copy initialization script
-COPY ./script/start-spark.sh /opt/spark-apps/start-spark.sh
-RUN chmod +x /opt/spark-apps/start-spark.sh
+# Copy initialization script to a non-shadowed path
+COPY ./script/start-spark.sh /usr/local/bin/start-spark.sh
+RUN chmod +x /usr/local/bin/start-spark.sh
 
 USER spark
-
-CMD ["/opt/spark-apps/start-spark.sh"]
+ENTRYPOINT ["/opt/spark-apps/start-spark.sh"]

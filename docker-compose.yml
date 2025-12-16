@@ -140,6 +140,7 @@ services:
     hostname: spark-master
     networks:
         - network
+    entrypoint: ["/usr/local/bin/start-spark.sh"]
     restart: always
     env_file: .env
     ports:
@@ -181,50 +182,13 @@ services:
         - spark-apps:/opt/spark-apps
         - spark-data:/opt/spark-data
         - ./data:/data
+    entrypoint: ["/usr/local/bin/start-spark.sh"]
     depends_on:
         - spark-master
 
-  hdfs-namenode:
-    container_name: hdfs-namenode
-    build:
-        context: ./Docker/hdfs/.
-    image: hdfs
-    hostname: hdfs-namenode
-    networks:
-        - network
-    restart: always
-    env_file: .env
-    ports:
-        - "9870:9870"   # NameNode Web UI
-        - "8020:8020"   # NameNode RPC
-    environment:
-        HADOOP_NAMENODE_OPTS: "-Dhadoop.security.logger=INFO,RFAS"
-    command: hdfs namenode
-    volumes:
-        - hdfs-namenode:/hadoop/dfs/name
-        - ./data:/data
+    # hdfs-namenode: removed
 
-  hdfs-datanode:
-    container_name: hdfs-datanode
-    build:
-        context: ./Docker/hdfs/.
-    image: hdfs
-    hostname: hdfs-datanode
-    networks:
-        - network
-    restart: always
-    env_file: .env
-    ports:
-        - "9864:9864"   # DataNode Web UI
-        - "9866:9866"   # DataNode data transfer
-    environment:
-        HADOOP_DATANODE_OPTS: "-Dhadoop.security.logger=ERROR,RFAS"
-    command: hdfs datanode
-    volumes:
-        - hdfs-datanode:/hadoop/dfs/data
-        - ./data:/data
-    depends_on:
-        - hdfs-namenode
+    # hdfs-datanode: removed
 
   flink-jobmanager:
     container_name: flink-jobmanager
@@ -245,6 +209,7 @@ services:
         FLINK_JOBMANAGER_RPC_PORT: 6123
         FLINK_PROPERTIES: |
             jobmanager.rpc.address: flink-jobmanager
+    entrypoint: ["/usr/local/bin/start-flink.sh"]
     volumes:
         - flink-apps:/opt/flink-apps
         - flink-data:/opt/flink-data
@@ -267,6 +232,7 @@ services:
         FLINK_PROPERTIES: |
             jobmanager.rpc.address: flink-jobmanager
             taskmanager.numberOfTaskSlots: 2
+    entrypoint: ["/usr/local/bin/start-flink.sh"]
     volumes:
         - flink-apps:/opt/flink-apps
         - flink-data:/opt/flink-data
@@ -290,8 +256,7 @@ volumes:
   spark-apps:
   spark-data:
   cassandra-data:
-  hdfs-namenode:
-  hdfs-datanode:
+    # HDFS volumes removed
   flink-apps:
   flink-data:
 
