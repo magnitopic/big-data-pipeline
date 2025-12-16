@@ -1,6 +1,3 @@
-spark:
-	@echo "Submitting ETL job to Spark master..."
-	docker exec -it spark-master /opt/spark/bin/spark-submit --master spark://spark-master:7077 /opt/spark-apps/pysparkConnector.py
 # INCLUDES #
 include .env
 
@@ -43,3 +40,6 @@ destroy: down remove_data
 
 re: destroy build
 	@echo "$(GREEN)<+> RESETTING CONTAINERS <+> $(COLOR_OFF)"
+spark:
+	@echo "Submitting ETL job to Spark master..."
+	docker exec -it spark-master /opt/spark/bin/spark-submit --master spark://spark-master:7077 /opt/spark-apps/pysparkConnector.py

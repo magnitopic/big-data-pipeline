@@ -3,9 +3,9 @@
 echo "Waiting for Cassandra to be ready..."
 sleep 30
 
-echo "Creating keyspace and tables for flight delay analysis..."
+echo "Creating keyspace and tables for historic flight/weather analysis..."
 
-# Apply full schema from tools
-cqlsh -f /opt/tools/schema_flight_delays.cql
+# Apply historic schema
+cqlsh -f /opt/tools/AHI_CQL_BD1_Historico.cql
 
 echo "Cassandra schema initialized successfully!"

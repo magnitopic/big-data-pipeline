@@ -7,16 +7,16 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import (
     col, sum, avg, count, when, month, year, 
     round, concat_ws, lit, coalesce, isnull, 
-    to_date, quarter
+    to_date, quarter, to_timestamp
 )
-from pyspark.sql.types import DoubleType, IntegerType
+from pyspark.sql.types import DoubleType, IntegerType, FloatType
 import sys
 import os
 
 # Cassandra configuration
 CASSANDRA_HOST = os.getenv("CASSANDRA_HOST", "cassandra")
 CASSANDRA_PORT = os.getenv("CASSANDRA_PORT", "9042")
-CASSANDRA_KEYSPACE = os.getenv("CASSANDRA_KEYSPACE", "flight_delays")
+CASSANDRA_KEYSPACE = os.getenv("CASSANDRA_KEYSPACE", "flight_weather_historic")
 
 # Data paths
 # Default to container path "/data"; allow override for local WSL runs via env.
@@ -52,85 +52,173 @@ def write_to_cassandra(df, table_name, mode="append"):
     print(f"✓ Written {df.count()} rows to Cassandra table: {table_name}")
 
 
-def load_and_clean_airline_delays(spark):
-    """Load and clean main airline delay data"""
-    print("\n=== Loading Airline_Delay_Cause.csv ===")
-    
+def load_airline_delay_cause_historico(spark):
+    """Load Airline_Delay_Cause.csv and align to Historico schema."""
+    print("\n=== Loading Airline_Delay_Cause.csv (Historico) ===")
+
     df = spark.read.csv(AIRLINE_DELAY_FILE, header=True, inferSchema=True)
-    
-    # Data quality: remove nulls and invalid data
-    df_clean = df.filter(
-        (col("arr_flights").isNotNull()) & 
-        (col("arr_flights") > 0) &
-        (col("year").isNotNull()) &
-        (col("month").isNotNull())
-    )
-    
-    # Cast numeric columns
-    numeric_cols = [
-        "arr_flights", "arr_del15", "arr_cancelled", "arr_diverted", 
-        "arr_delay", "carrier_delay", "weather_delay", "nas_delay", 
-        "security_delay", "late_aircraft_delay"
+
+    # Ensure required keys exist
+    required_keys = ["year", "month", "airport", "carrier"]
+    for k in required_keys:
+        if k not in df.columns:
+            raise ValueError(f"Missing required column '{k}' in Airline_Delay_Cause.csv")
+
+    # Add optional columns if missing and cast types to match Historico table
+    float_cols = [
+        "carrier_ct", "weather_ct", "nas_ct", "security_ct", "late_aircraft_ct",
+        "arr_delay", "carrier_delay", "weather_delay", "nas_delay", "security_delay", "late_aircraft_delay"
     ]
-    
-    for col_name in numeric_cols:
-        df_clean = df_clean.withColumn(col_name, coalesce(col(col_name), lit(0)).cast(DoubleType()))
-    
-    # Calculate derived metrics
-    df_transformed = df_clean.withColumn(
-        "delay_rate", 
-        round((col("arr_del15") / col("arr_flights") * 100), 2)
-    ).withColumn(
-        "cancellation_rate", 
-        round((col("arr_cancelled") / col("arr_flights") * 100), 2)
-    ).withColumn(
-        "avg_delay_per_flight", 
-        round((col("arr_delay") / col("arr_flights")), 2)
-    ).withColumn(
-        "weather_delay_pct",
-        round((col("weather_delay") / col("arr_delay") * 100), 2)
-    ).withColumn(
-        "carrier_delay_pct",
-        round((col("carrier_delay") / col("arr_delay") * 100), 2)
-    ).withColumn(
-        "date_key",
-        concat_ws("-", col("year"), col("month"), lit("01"))
-    ).withColumn(
-        "quarter",
-        quarter(to_date(col("date_key")))
+    int_cols = ["arr_flights", "arr_del15", "arr_cancelled", "arr_diverted"]
+    text_cols = ["airport_name", "carrier_name"]
+
+    for c in float_cols:
+        if c not in df.columns:
+            df = df.withColumn(c, lit(None).cast(FloatType()))
+        else:
+            df = df.withColumn(c, col(c).cast(FloatType()))
+
+    for c in int_cols:
+        if c not in df.columns:
+            df = df.withColumn(c, lit(None).cast(IntegerType()))
+        else:
+            df = df.withColumn(c, col(c).cast(IntegerType()))
+
+    for c in text_cols:
+        if c not in df.columns:
+            df = df.withColumn(c, lit(None))
+
+    # Select and order columns as in table
+    selected = df.select(
+        col("year").cast(IntegerType()),
+        col("month").cast(IntegerType()),
+        col("airport").cast("string"),
+        col("carrier").cast("string"),
+        col("airport_name").cast("string"),
+        col("carrier_name").cast("string"),
+        col("carrier_ct"),
+        col("weather_ct"),
+        col("nas_ct"),
+        col("security_ct"),
+        col("late_aircraft_ct"),
+        col("arr_flights"),
+        col("arr_del15"),
+        col("arr_cancelled"),
+        col("arr_diverted"),
+        col("arr_delay"),
+        col("carrier_delay"),
+        col("weather_delay"),
+        col("nas_delay"),
+        col("security_delay"),
+        col("late_aircraft_delay")
     )
-    
-    print(f"Loaded {df_transformed.count()} records from Airline_Delay_Cause")
-    return df_transformed
+
+    print(f"Loaded {selected.count()} records for airline_delay_cause")
+    return selected
 
 
-def load_delays_sample(spark):
-    """Load individual flight delay samples"""
-    print("\n=== Loading delays_history_sample.csv ===")
-    
+def load_delays_history_sample_historico(spark):
+    """Load delays_history_sample.csv and align to Historico schema."""
+    print("\n=== Loading delays_history_sample.csv (Historico) ===")
+
     df = spark.read.csv(DELAYS_SAMPLE_FILE, header=True, inferSchema=True)
-    
-    # Clean and transform
-    df_clean = df.filter(
-        (col("flight_id").isNotNull()) &
-        (col("flight_date").isNotNull())
-    ).withColumn(
-        "departure_delay_min", coalesce(col("departure_delay_min"), lit(0))
-    ).withColumn(
-        "arrival_delay_min", coalesce(col("arrival_delay_min"), lit(0))
-    ).withColumn(
-        "is_delayed", when(col("arrival_delay_min") > 15, 1).otherwise(0)
-    ).withColumn(
-        "delay_severity",
-        when(col("arrival_delay_min") <= 0, "On Time")
-        .when(col("arrival_delay_min") <= 15, "Minor")
-        .when(col("arrival_delay_min") <= 30, "Moderate")
-        .when(col("arrival_delay_min") <= 60, "Significant")
-        .otherwise("Severe")
+
+    # Validate required columns
+    required = [
+        "flight_id", "origin_airport", "dest_airport", "airline", "flight_date",
+        "scheduled_departure", "actual_departure", "scheduled_arrival", "actual_arrival",
+        "departure_delay_min", "arrival_delay_min", "delay_cause"
+    ]
+    for k in required:
+        if k not in df.columns:
+            # Allow partial datasets: fill missing with nulls where not key
+            if k == "flight_id":
+                raise ValueError("delays_history_sample.csv missing required primary key 'flight_id'")
+            df = df.withColumn(k, lit(None))
+
+    # Cast types
+    df_typed = (
+        df.withColumn("flight_id", col("flight_id").cast("string"))
+          .withColumn("origin_airport", col("origin_airport").cast("string"))
+          .withColumn("dest_airport", col("dest_airport").cast("string"))
+          .withColumn("airline", col("airline").cast("string"))
+          .withColumn("flight_date", to_date(col("flight_date")))
+          .withColumn("scheduled_departure", to_timestamp(col("scheduled_departure")))
+          .withColumn("actual_departure", to_timestamp(col("actual_departure")))
+          .withColumn("scheduled_arrival", to_timestamp(col("scheduled_arrival")))
+          .withColumn("actual_arrival", to_timestamp(col("actual_arrival")))
+          .withColumn("departure_delay_min", col("departure_delay_min").cast(IntegerType()))
+          .withColumn("arrival_delay_min", col("arrival_delay_min").cast(IntegerType()))
+          .withColumn("delay_cause", col("delay_cause").cast("string"))
     )
-    
-    print(f"Loaded {df_clean.count()} flight samples")
-    return df_clean
+
+    # Keep only table columns
+    selected = df_typed.select(
+        "flight_id", "origin_airport", "dest_airport", "airline", "flight_date",
+        "scheduled_departure", "actual_departure", "scheduled_arrival", "actual_arrival",
+        "departure_delay_min", "arrival_delay_min", "delay_cause"
+    )
+
+    print(f"Loaded {selected.count()} records for delays_history_sample")
+    return selected
+
+def load_delays_history_agg_historico(spark):
+    """Load delays_history_agg.csv and align to Historico schema."""
+    print("\n=== Loading delays_history_agg.csv (Historico) ===")
+
+    df = spark.read.csv(DELAYS_AGG_FILE, header=True, inferSchema=True)
+
+    required_keys = ["year", "month", "airport", "carrier"]
+    for k in required_keys:
+        if k not in df.columns:
+            raise ValueError(f"Missing required column '{k}' in delays_history_agg.csv")
+
+    float_cols = [
+        "avg_arr_delay_min", "pct_arr_del15",
+        "arr_delay", "carrier_delay", "weather_delay", "nas_delay", "security_delay", "late_aircraft_delay"
+    ]
+    int_cols = ["arr_flights", "arr_del15", "arr_cancelled", "arr_diverted"]
+    text_cols = ["airport_name", "carrier_name"]
+
+    for c in float_cols:
+        if c not in df.columns:
+            df = df.withColumn(c, lit(None).cast(FloatType()))
+        else:
+            df = df.withColumn(c, col(c).cast(FloatType()))
+
+    for c in int_cols:
+        if c not in df.columns:
+            df = df.withColumn(c, lit(None).cast(IntegerType()))
+        else:
+            df = df.withColumn(c, col(c).cast(IntegerType()))
+
+    for c in text_cols:
+        if c not in df.columns:
+            df = df.withColumn(c, lit(None))
+
+    selected = df.select(
+        col("year").cast(IntegerType()),
+        col("month").cast(IntegerType()),
+        col("airport").cast("string"),
+        col("carrier").cast("string"),
+        col("airport_name").cast("string"),
+        col("carrier_name").cast("string"),
+        col("avg_arr_delay_min"),
+        col("pct_arr_del15"),
+        col("arr_flights"),
+        col("arr_del15"),
+        col("arr_cancelled"),
+        col("arr_diverted"),
+        col("arr_delay"),
+        col("carrier_delay"),
+        col("weather_delay"),
+        col("nas_delay"),
+        col("security_delay"),
+        col("late_aircraft_delay")
+    )
+
+    print(f"Loaded {selected.count()} records for delays_history_agg")
+    return selected
 
 
 def create_fact_delays(df_airline_delays):
@@ -332,71 +420,41 @@ def create_data_quality_report(df_original, df_clean, dataset_name):
 
 
 def main():
-    """Main ETL pipeline"""
+    """Main ETL pipeline targeting Historico schema"""
     print("=" * 60)
-    print("FLIGHT DELAYS ETL PIPELINE → Cassandra")
+    print("FLIGHT HISTORICO ETL PIPELINE → Cassandra")
     print("=" * 60)
-    
+
     # Initialize Spark
     spark = create_spark_session()
     spark.sparkContext.setLogLevel("WARN")
-    
-    try:
-        # Load and transform data
-        df_airline_delays = load_and_clean_airline_delays(spark)
-        df_sample = load_delays_sample(spark)
-        
-        # Create fact table
-        fact_delays = create_fact_delays(df_airline_delays)
-        write_to_cassandra(fact_delays, "fact_flight_delays")
 
-        # Create dimension tables
-        dim_airports = create_dim_airports(df_airline_delays)
-        write_to_cassandra(dim_airports, "dim_airports")
-        
-        dim_airlines = create_dim_airlines(df_airline_delays)
-        write_to_cassandra(dim_airlines, "dim_airlines")
-        
-        # Create aggregated tables for analytics
-        agg_airport = create_agg_airport_performance(df_airline_delays)
-        write_to_cassandra(agg_airport, "agg_airport_performance")
-        
-        agg_airline = create_agg_airline_performance(df_airline_delays)
-        write_to_cassandra(agg_airline, "agg_airline_performance")
-        
-        agg_monthly = create_agg_monthly_trends(df_airline_delays)
-        write_to_cassandra(agg_monthly, "agg_monthly_trends")
-        
-        agg_causes = create_agg_delay_causes(df_airline_delays)
-        write_to_cassandra(agg_causes, "agg_delay_causes")
-        
-        agg_routes = create_agg_route_analysis(df_sample)
-        write_to_cassandra(agg_routes, "agg_route_analysis")
-        
-        # Write sample data
-        write_to_cassandra(df_sample, "fact_flight_samples")
-        
+    try:
+        # Load CSVs aligned to Historico tables
+        df_airline_cause = load_airline_delay_cause_historico(spark)
+        df_agg = load_delays_history_agg_historico(spark)
+        df_sample = load_delays_history_sample_historico(spark)
+
+        # Write to Cassandra (Historico keyspace)
+        write_to_cassandra(df_airline_cause, "airline_delay_cause")
+        write_to_cassandra(df_agg, "delays_history_agg")
+        write_to_cassandra(df_sample, "delays_history_sample")
+
         print("\n" + "=" * 60)
-        print("ETL PIPELINE COMPLETED SUCCESSFULLY (Cassandra)")
+        print("ETL PIPELINE COMPLETED SUCCESSFULLY (Historico)")
         print("=" * 60)
-        print("\nTables created in Cassandra:")
-        print("  - fact_flight_delays (main fact table)")
-        print("  - fact_flight_samples (individual flights)")
-        print("  - dim_airports (airport dimension)")
-        print("  - dim_airlines (airline dimension)")
-        print("  - agg_airport_performance (for airport analysis)")
-        print("  - agg_airline_performance (for airline comparison)")
-        print("  - agg_monthly_trends (for time series)")
-        print("  - agg_delay_causes (for cause breakdown)")
-        print("  - agg_route_analysis (for route performance)")
+        print("\nTables written in Cassandra (flight_weather_historic):")
+        print("  - airline_delay_cause")
+        print("  - delays_history_agg")
+        print("  - delays_history_sample")
         print("\nReady for Power BI connection!")
-        
+
     except Exception as e:
         print(f"\n❌ Error in ETL pipeline: {str(e)}")
         import traceback
         traceback.print_exc()
         sys.exit(1)
-    
+
     finally:
         spark.stop()
 
