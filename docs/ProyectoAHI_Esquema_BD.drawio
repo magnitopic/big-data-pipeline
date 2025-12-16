@@ -1,11 +1,11 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.2.5 Chrome/138.0.7204.251 Electron/37.6.1 Safari/537.36" version="28.2.5">
   <diagram name="Página-1" id="LGGo40Vtem46FPLwisgT">
-    <mxGraphModel dx="777" dy="664" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="996" dy="664" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="Wwnz-y438Q_InPiHNb-y-106" value="Casandra 1 (Historico)" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry width="880" height="660" as="geometry">
+          <mxGeometry width="890" height="660" as="geometry">
             <mxRectangle width="40" height="660" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
@@ -178,70 +178,70 @@
           <mxGeometry y="540" width="160" height="30" as="geometry" />
         </mxCell>
         <mxCell id="Wwnz-y438Q_InPiHNb-y-83" value="weather_lcd" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-106" vertex="1">
-          <mxGeometry x="670" width="210" height="660" as="geometry" />
+          <mxGeometry x="670" width="220" height="660" as="geometry" />
         </mxCell>
         <mxCell id="Wwnz-y438Q_InPiHNb-y-85" value="station TEXT" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
-          <mxGeometry y="30" width="210" height="30" as="geometry" />
+          <mxGeometry y="30" width="220" height="30" as="geometry" />
         </mxCell>
         <mxCell id="Wwnz-y438Q_InPiHNb-y-84" value="date TIMESTAMP" style="text;strokeColor=none;fillColor=#67AB9F;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
-          <mxGeometry y="60" width="210" height="30" as="geometry" />
+          <mxGeometry y="60" width="220" height="30" as="geometry" />
         </mxCell>
         <mxCell id="Wwnz-y438Q_InPiHNb-y-93" value="name TEXT" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
-          <mxGeometry y="90" width="210" height="30" as="geometry" />
+          <mxGeometry y="90" width="220" height="30" as="geometry" />
         </mxCell>
         <mxCell id="Wwnz-y438Q_InPiHNb-y-92" value="latitude&amp;nbsp;FLOAT" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
-          <mxGeometry y="120" width="210" height="30" as="geometry" />
+          <mxGeometry y="120" width="220" height="30" as="geometry" />
         </mxCell>
         <mxCell id="Wwnz-y438Q_InPiHNb-y-98" value="longitude&amp;nbsp;FLOAT" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
-          <mxGeometry y="150" width="210" height="30" as="geometry" />
+          <mxGeometry y="150" width="220" height="30" as="geometry" />
         </mxCell>
         <mxCell id="Wwnz-y438Q_InPiHNb-y-89" value="elevation&amp;nbsp;FLOAT" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
-          <mxGeometry y="180" width="210" height="30" as="geometry" />
+          <mxGeometry y="180" width="220" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="Wwnz-y438Q_InPiHNb-y-90" value="HourlyAltimeterSetting&amp;nbsp;FLOAT" style="text;strokeColor=none;fillColor=#EA6B66;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
-          <mxGeometry y="210" width="210" height="30" as="geometry" />
+        <mxCell id="Wwnz-y438Q_InPiHNb-y-90" value="hourly_altimeter_setting FLOAT" style="text;strokeColor=none;fillColor=#EA6B66;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
+          <mxGeometry y="210" width="220" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="Wwnz-y438Q_InPiHNb-y-102" value="HourlyDewPointTemperature&amp;nbsp;FLOAT" style="text;strokeColor=none;fillColor=#EA6B66;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
-          <mxGeometry y="240" width="210" height="30" as="geometry" />
+        <mxCell id="Wwnz-y438Q_InPiHNb-y-102" value="hourly_dew_point_temperature&amp;nbsp;FLOAT" style="text;strokeColor=none;fillColor=#EA6B66;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
+          <mxGeometry y="240" width="220" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="Wwnz-y438Q_InPiHNb-y-103" value="HourlyDryBulbTemperature&amp;nbsp;FLOAT" style="text;strokeColor=none;fillColor=#EA6B66;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
-          <mxGeometry y="270" width="210" height="30" as="geometry" />
+        <mxCell id="Wwnz-y438Q_InPiHNb-y-103" value="hourly_dry_bulb_temperature FLOAT" style="text;strokeColor=none;fillColor=#EA6B66;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
+          <mxGeometry y="270" width="220" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="Wwnz-y438Q_InPiHNb-y-99" value="HourlyPrecipitation&amp;nbsp;FLOAT" style="text;strokeColor=none;fillColor=#EA6B66;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
-          <mxGeometry y="300" width="210" height="30" as="geometry" />
+        <mxCell id="Wwnz-y438Q_InPiHNb-y-99" value="hourly_precipitation FLOAT" style="text;strokeColor=none;fillColor=#EA6B66;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
+          <mxGeometry y="300" width="220" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="Wwnz-y438Q_InPiHNb-y-100" value="HourlyPresentWeatherType INT" style="text;strokeColor=none;fillColor=#EA6B66;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
-          <mxGeometry y="330" width="210" height="30" as="geometry" />
+        <mxCell id="Wwnz-y438Q_InPiHNb-y-100" value="hourly_present_weather_type INT" style="text;strokeColor=none;fillColor=#EA6B66;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
+          <mxGeometry y="330" width="220" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="Wwnz-y438Q_InPiHNb-y-104" value="HourlyPressureChange TEXT" style="text;strokeColor=none;fillColor=#EA6B66;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
-          <mxGeometry y="360" width="210" height="30" as="geometry" />
+        <mxCell id="Wwnz-y438Q_InPiHNb-y-104" value="hourly_pressure_change TEXT" style="text;strokeColor=none;fillColor=#EA6B66;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
+          <mxGeometry y="360" width="220" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="Wwnz-y438Q_InPiHNb-y-94" value="HourlyPressureTendency&amp;nbsp;FLOAT" style="text;strokeColor=none;fillColor=#EA6B66;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
-          <mxGeometry y="390" width="210" height="30" as="geometry" />
+        <mxCell id="Wwnz-y438Q_InPiHNb-y-94" value="hourly_pressure_tendency FLOAT" style="text;strokeColor=none;fillColor=#EA6B66;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
+          <mxGeometry y="390" width="220" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="Wwnz-y438Q_InPiHNb-y-91" value="HourlyRelativeHumidity&amp;nbsp;FLOAT" style="text;strokeColor=none;fillColor=#EA6B66;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
-          <mxGeometry y="420" width="210" height="30" as="geometry" />
+        <mxCell id="Wwnz-y438Q_InPiHNb-y-91" value="hourly_relative_humidity FLOAT" style="text;strokeColor=none;fillColor=#EA6B66;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
+          <mxGeometry y="420" width="220" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="Wwnz-y438Q_InPiHNb-y-97" value="HourlySkyConditions TEXT" style="text;strokeColor=none;fillColor=#EA6B66;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
-          <mxGeometry y="450" width="210" height="30" as="geometry" />
+        <mxCell id="Wwnz-y438Q_InPiHNb-y-97" value="hourly_sky_conditions TEXT" style="text;strokeColor=none;fillColor=#EA6B66;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
+          <mxGeometry y="450" width="220" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="Wwnz-y438Q_InPiHNb-y-95" value="HourlySeaLevelPressure&amp;nbsp;FLOAT" style="text;strokeColor=none;fillColor=#EA6B66;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
-          <mxGeometry y="480" width="210" height="30" as="geometry" />
+        <mxCell id="Wwnz-y438Q_InPiHNb-y-95" value="hourly_sea_level_pressure FLOAT" style="text;strokeColor=none;fillColor=#EA6B66;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
+          <mxGeometry y="480" width="220" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="Wwnz-y438Q_InPiHNb-y-101" value="HourlyVisibility&amp;nbsp;FLOAT" style="text;strokeColor=none;fillColor=#EA6B66;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
-          <mxGeometry y="510" width="210" height="30" as="geometry" />
+        <mxCell id="Wwnz-y438Q_InPiHNb-y-101" value="hourly_visibility FLOAT" style="text;strokeColor=none;fillColor=#EA6B66;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
+          <mxGeometry y="510" width="220" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="Wwnz-y438Q_InPiHNb-y-96" value="HourlyWetBulbTemperature&amp;nbsp;FLOAT" style="text;strokeColor=none;fillColor=#EA6B66;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
-          <mxGeometry y="540" width="210" height="30" as="geometry" />
+        <mxCell id="Wwnz-y438Q_InPiHNb-y-96" value="hourly_wet_bulb_temperature FLOAT" style="text;strokeColor=none;fillColor=#EA6B66;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
+          <mxGeometry y="540" width="220" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="Wwnz-y438Q_InPiHNb-y-86" value="HourlyWindDirection&amp;nbsp;FLOAT" style="text;strokeColor=none;fillColor=#EA6B66;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
-          <mxGeometry y="570" width="210" height="30" as="geometry" />
+        <mxCell id="Wwnz-y438Q_InPiHNb-y-86" value="hourly_wind_direction FLOAT" style="text;strokeColor=none;fillColor=#EA6B66;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
+          <mxGeometry y="570" width="220" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="Wwnz-y438Q_InPiHNb-y-88" value="HourlyWindGustSpeed&amp;nbsp;FLOAT" style="text;strokeColor=none;fillColor=#EA6B66;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
-          <mxGeometry y="600" width="210" height="30" as="geometry" />
+        <mxCell id="Wwnz-y438Q_InPiHNb-y-88" value="hourly_wind_gust_speed FLOAT" style="text;strokeColor=none;fillColor=#EA6B66;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
+          <mxGeometry y="600" width="220" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="Wwnz-y438Q_InPiHNb-y-87" value="HourlyWindSpeed&amp;nbsp;FLOAT" style="text;strokeColor=none;fillColor=#EA6B66;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
-          <mxGeometry y="630" width="210" height="30" as="geometry" />
+        <mxCell id="Wwnz-y438Q_InPiHNb-y-87" value="hourly_wind_speed FLOAT" style="text;strokeColor=none;fillColor=#EA6B66;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-83" vertex="1">
+          <mxGeometry y="630" width="220" height="30" as="geometry" />
         </mxCell>
         <mxCell id="Wwnz-y438Q_InPiHNb-y-107" value="Casandra 2 (Streaming)" style="swimlane;horizontal=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry y="670" width="400" height="490" as="geometry" />
@@ -326,12 +326,6 @@
         </mxCell>
         <mxCell id="Wwnz-y438Q_InPiHNb-y-137" value="weather_description&amp;nbsp;STRING" style="text;strokeColor=none;fillColor=#EA6B66;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="Wwnz-y438Q_InPiHNb-y-123" vertex="1">
           <mxGeometry y="420" width="170" height="30" as="geometry" />
-        </mxCell>
-        <mxCell id="GPN03KJTyntfWUja94Ph-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="GPN03KJTyntfWUja94Ph-1" target="Wwnz-y438Q_InPiHNb-y-83" edge="1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="GPN03KJTyntfWUja94Ph-1" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Nota&lt;/h1&gt;&lt;div&gt;- Los campos en ROJO no tienen mayusculas.&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="685" y="680" width="180" height="80" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

@@ -1,278 +1,212 @@
+version: "3.9"
+
 services:
-  mariadb:
-    container_name: mariadb
-    build:
-        context: ./Docker/mariadb/.
-    image: mariadb
-    networks:
-        - network
-    restart: always
-    env_file: .env
-    ports:
-        - "3306:3306"
 
-  cassandra:
-    container_name: cassandra
-    build:
-        context: ./Docker/cassandra/.
-    image: cassandra
-    hostname: cassandra
-    networks:
-        - network
-    restart: always
-    env_file: .env
-    ports:
-        - "9042:9042"   # CQL native transport
-        - "9160:9160"   # Thrift client API
-    environment:
-        CASSANDRA_CLUSTER_NAME: flight_delays_cluster
-        CASSANDRA_DC: dc1
-        CASSANDRA_RACK: rack1
-        CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
-        CASSANDRA_NUM_TOKENS: 256
-    volumes:
-        - cassandra-data:/var/lib/cassandra
-    healthcheck:
-        test: ["CMD", "cqlsh", "-e", "describe keyspaces"]
-        interval: 30s
-        timeout: 10s
-        retries: 5
-
-  mongodb:
-    container_name: mongodb
-    build:
-        context: ./Docker/mongodb/.
-    image: mongodb
-    hostname: mongodb
-    networks:
-        - network
-    restart: always
-    env_file: .env
-    ports:
-        - "27017:27017"
-    environment:
-        MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
-        MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
-        MONGO_INITDB_DATABASE: ${MONGO_DATABASE:-flight_delays}
-    volumes:
-        - mongodb-data:/data/db
-        - mongodb-config:/data/configdb
-
+  #####################################################################
+  # ✅ NIFI — INGESTA / ORQUESTACIÓN
+  #####################################################################
   nifi:
     container_name: nifi
-    build:
-        context: ./Docker/nifi/.
-    image: nifi
-    hostname: nifi
-    networks:
-        - network
+    image:  apache/nifi:1.21.0
     restart: always
-    env_file: .env
     ports:
-        - "8443:8443"  # HTTPS UI
-        - "8080:8080"  # HTTP UI (if needed)
+        - "8080:8080"
     environment:
-        NIFI_WEB_HTTPS_PORT: 8443
-        NIFI_WEB_HTTPS_HOST: 0.0.0.0
-        SINGLE_USER_CREDENTIALS_USERNAME: ${NIFI_USERNAME}
-        SINGLE_USER_CREDENTIALS_PASSWORD: ${NIFI_PASSWORD}
-        NIFI_JVM_HEAP_INIT: ${NIFI_JVM_HEAP_INIT}
-        NIFI_JVM_HEAP_MAX: ${NIFI_JVM_HEAP_MAX}
+        NIFI_WEB_HTTP_PORT: 8080
+        NIFI_WEB_HTTP_HOST: 0.0.0.0
     volumes:
-        - nifi-conf:/opt/nifi/nifi-current/conf
-        - nifi-database:/opt/nifi/nifi-current/database_repository
-        - nifi-flowfile:/opt/nifi/nifi-current/flowfile_repository
-        - nifi-content:/opt/nifi/nifi-current/content_repository
-        - nifi-provenance:/opt/nifi/nifi-current/provenance_repository
-        - nifi-state:/opt/nifi/nifi-current/state
-        - nifi-logs:/opt/nifi/nifi-current/logs
-        - ./data:/opt/nifi/data
-
-  kafka:
-    container_name: kafka
-    build:
-        context: ./Docker/kafka/.
-    image: kafka
-    hostname: kafka
-    networks:
-        - network
-    restart: always
-    env_file: .env
-    ports:
-        - "9092:9092"   # Kafka broker
-        - "9093:9093"   # External listener
-    environment:
-        KAFKA_BROKER_ID: 1
-        KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-        KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
-        KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-        KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-        KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-        KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-        KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-        KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
-    volumes:
-        - kafka-data:/var/lib/kafka/data
-    depends_on:
-        - zookeeper
-
+    - ./data:/opt/nifi/data
+  
+  #####################################################################
+  # ✅ ZOOKEEPER — REQUERIDO POR KAFKA
+  #####################################################################
   zookeeper:
     container_name: zookeeper
     image: confluentinc/cp-zookeeper:7.5.0
     hostname: zookeeper
     networks:
-        - network
+      - network
     restart: always
     ports:
-        - "2181:2181"
+      - "2181:2181"
     environment:
-        ZOOKEEPER_CLIENT_PORT: 2181
-        ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
     volumes:
-        - zookeeper-data:/var/lib/zookeeper/data
-        - zookeeper-logs:/var/lib/zookeeper/log
+      - zookeeper-data:/var/lib/zookeeper/data
+      - zookeeper-logs:/var/lib/zookeeper/log
 
-  spark-master:
-    container_name: spark-master
+
+  #####################################################################
+  # ✅ KAFKA — STREAMING
+  #####################################################################
+  kafka:
+    container_name: kafka
     build:
-        context: ./Docker/spark/.
-    image: spark
-    hostname: spark-master
+      context: ./Docker/kafka/.
+    image: kafka
+    hostname: kafka
     networks:
-        - network
+      - network
     restart: always
     env_file: .env
     ports:
-        - "7077:7077"   # Spark master port
-        - "8081:8080"   # Spark master web UI
+      - "9092:9092"
     environment:
-        SPARK_MODE: master
-        SPARK_RPC_AUTHENTICATION_ENABLED: "no"
-        SPARK_RPC_ENCRYPTION_ENABLED: "no"
-        SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: "no"
-        SPARK_SSL_ENABLED: "no"
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
     volumes:
-        - spark-apps:/opt/spark-apps
-        - spark-data:/opt/spark-data
-        - ./data:/data
-
-  spark-worker:
-    container_name: spark-worker
-    build:
-        context: ./Docker/spark/.
-    image: spark
-    hostname: spark-worker
-    networks:
-        - network
-    restart: always
-    env_file: .env
-    ports:
-        - "8082:8081"   # Spark worker web UI
-    environment:
-        SPARK_MODE: worker
-        SPARK_MASTER_URL: spark://spark-master:7077
-        SPARK_WORKER_MEMORY: ${SPARK_WORKER_MEMORY:-2G}
-        SPARK_WORKER_CORES: ${SPARK_WORKER_CORES:-2}
-        SPARK_RPC_AUTHENTICATION_ENABLED: "no"
-        SPARK_RPC_ENCRYPTION_ENABLED: "no"
-        SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: "no"
-        SPARK_SSL_ENABLED: "no"
-    volumes:
-        - spark-apps:/opt/spark-apps
-        - spark-data:/opt/spark-data
-        - ./data:/data
+      - kafka-data:/var/lib/kafka/data
     depends_on:
-        - spark-master
+      - zookeeper
 
-  hdfs-namenode:
-    container_name: hdfs-namenode
-    build:
-        context: ./Docker/hdfs/.
-    image: hdfs
-    hostname: hdfs-namenode
-    networks:
-        - network
-    restart: always
-    env_file: .env
-    ports:
-        - "9870:9870"   # NameNode Web UI
-        - "8020:8020"   # NameNode RPC
-    environment:
-        HADOOP_NAMENODE_OPTS: "-Dhadoop.security.logger=INFO,RFAS"
-    command: hdfs namenode
-    volumes:
-        - hdfs-namenode:/hadoop/dfs/name
-        - ./data:/data
 
-  hdfs-datanode:
-    container_name: hdfs-datanode
-    build:
-        context: ./Docker/hdfs/.
-    image: hdfs
-    hostname: hdfs-datanode
-    networks:
-        - network
-    restart: always
-    env_file: .env
-    ports:
-        - "9864:9864"   # DataNode Web UI
-        - "9866:9866"   # DataNode data transfer
-    environment:
-        HADOOP_DATANODE_OPTS: "-Dhadoop.security.logger=ERROR,RFAS"
-    command: hdfs datanode
-    volumes:
-        - hdfs-datanode:/hadoop/dfs/data
-        - ./data:/data
-    depends_on:
-        - hdfs-namenode
+  #####################################################################
+  # 💤 BASES DE DATOS — DESACTIVADAS (ACTIVAR SOLO SI SE USAN)
+  #####################################################################
 
-  flink-jobmanager:
-    container_name: flink-jobmanager
-    build:
-        context: ./Docker/flink/.
-    image: flink
-    hostname: flink-jobmanager
-    networks:
-        - network
-    restart: always
-    env_file: .env
-    ports:
-        - "8083:8081"   # Flink Web UI
-        - "6123:6123"   # Flink RPC
-        - "9249:9249"   # Prometheus metrics
-    environment:
-        FLINK_MODE: jobmanager
-        FLINK_JOBMANAGER_RPC_PORT: 6123
-        FLINK_PROPERTIES: |
-            jobmanager.rpc.address: flink-jobmanager
-    volumes:
-        - flink-apps:/opt/flink-apps
-        - flink-data:/opt/flink-data
-        - ./data:/data
+  # mariadb:
+  #   container_name: mariadb
+  #   build:
+  #     context: ./Docker/mariadb/.
+  #   image: mariadb
+  #   networks:
+  #     - network
+  #   restart: always
+  #   env_file: .env
+  #   ports:
+  #     - "3306:3306"
 
-  flink-taskmanager:
-    container_name: flink-taskmanager
-    build:
-        context: ./Docker/flink/.
-    image: flink
-    hostname: flink-taskmanager
-    networks:
-        - network
-    restart: always
-    env_file: .env
-    environment:
-        FLINK_MODE: taskmanager
-        FLINK_JOBMANAGER_HOST: flink-jobmanager
-        FLINK_JOBMANAGER_RPC_PORT: 6123
-        FLINK_PROPERTIES: |
-            jobmanager.rpc.address: flink-jobmanager
-            taskmanager.numberOfTaskSlots: 2
-    volumes:
-        - flink-apps:/opt/flink-apps
-        - flink-data:/opt/flink-data
-        - ./data:/data
-    depends_on:
-        - flink-jobmanager
+  # mongodb:
+  #   container_name: mongodb
+  #   build:
+  #     context: ./Docker/mongodb/.
+  #   image: mongodb
+  #   hostname: mongodb
+  #   networks:
+  #     - network
+  #   restart: always
+  #   env_file: .env
+  #   ports:
+  #     - "27017:27017"
+
+  # cassandra:
+  #   container_name: cassandra
+  #   build:
+  #     context: ./Docker/cassandra/.
+  #   image: cassandra
+  #   hostname: cassandra
+  #   networks:
+  #     - network
+  #   restart: always
+  #   ports:
+  #     - "9042:9042"
+
+
+  #####################################################################
+  # 💤 SPARK — DESACTIVADO (ACTIVAR PARA BATCH PROCESSING)
+  #####################################################################
+
+  # spark-master:
+  #   container_name: spark-master
+  #   build:
+  #     context: ./Docker/spark/.
+  #   image: spark
+  #   hostname: spark-master
+  #   networks:
+  #     - network
+  #   restart: always
+  #   ports:
+  #     - "7077:7077"
+  #     - "8081:8080"
+  #   environment:
+  #     SPARK_MODE: master
+
+  # spark-worker:
+  #   container_name: spark-worker
+  #   build:
+  #     context: ./Docker/spark/.
+  #   image: spark
+  #   hostname: spark-worker
+  #   networks:
+  #     - network
+  #   restart: always
+  #   ports:
+  #     - "8082:8081"
+  #   environment:
+  #     SPARK_MODE: worker
+  #     SPARK_MASTER_URL: spark://spark-master:7077
+  #   depends_on:
+  #     - spark-master
+
+
+  #####################################################################
+  # 💤 HDFS — DESACTIVADO (ACTIVAR SOLO SI REALMENTE SE USA)
+  #####################################################################
+
+  # hdfs-namenode:
+  #   container_name: hdfs-namenode
+  #   build:
+  #     context: ./Docker/hdfs/.
+  #   image: hdfs
+  #   hostname: hdfs-namenode
+  #   networks:
+  #     - network
+  #   restart: always
+  #   ports:
+  #     - "9870:9870"
+  #     - "8020:8020"
+
+  # hdfs-datanode:
+  #   container_name: hdfs-datanode
+  #   build:
+  #     context: ./Docker/hdfs/.
+  #   image: hdfs
+  #   hostname: hdfs-datanode
+  #   networks:
+  #     - network
+  #   restart: always
+  #   ports:
+  #     - "9864:9864"
+  #   depends_on:
+  #     - hdfs-namenode
+
+
+  #####################################################################
+  # 💤 FLINK — DESACTIVADO (ACTIVAR PARA STREAM PROCESSING)
+  #####################################################################
+
+  # flink-jobmanager:
+  #   container_name: flink-jobmanager
+  #   build:
+  #     context: ./Docker/flink/.
+  #   image: flink
+  #   hostname: flink-jobmanager
+  #   networks:
+  #     - network
+  #   restart: always
+  #   ports:
+  #     - "8083:8081"
+  #     - "6123:6123"
+
+  # flink-taskmanager:
+  #   container_name: flink-taskmanager
+  #   build:
+  #     context: ./Docker/flink/.
+  #   image: flink
+  #   hostname: flink-taskmanager
+  #   networks:
+  #     - network
+  #   restart: always
+  #   depends_on:
+  #     - flink-jobmanager
 
 volumes:
   nifi-conf:
