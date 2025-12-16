@@ -26,20 +26,9 @@ down: stop
 	@echo "$(GREEN)<+> DELETING BUILD <+> $(COLOR_OFF)"
 	@docker compose -f $(DOCKER_COMPOSE) down -v
 
-remove_data:
-	@echo "$(GREEN)<+> REMOVING DATA <+> $(COLOR_OFF)"
-	@rm -rf $(DATA_PATH)
-	@rm -rf $(UPLOADS_PATH)
-	@rm -rf $(DOWNLOADS_PATH)
-
-destroy: down remove_data
-	@echo "$(GREEN)<+> REMOVING ALL IMAGES <+> $(COLOR_OFF)"
-	@rm -rf $(BACKEND_NODE_MODULES) $(BACKEND_PACKAGE_LOCK)
-	@rm -rf $(FRONTEND_NODE_MODULES) $(FRONTEND_PACKAGE_LOCK)
-	@docker system prune -af
-
-re: destroy build
+re: down build
 	@echo "$(GREEN)<+> RESETTING CONTAINERS <+> $(COLOR_OFF)"
+
 spark:
 	@echo "Submitting ETL job to Spark master..."
 	docker exec -it spark-master /opt/spark/bin/spark-submit --master spark://spark-master:7077 /opt/spark-apps/pysparkConnector.py
