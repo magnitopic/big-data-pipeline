@@ -95,54 +95,56 @@ services:
   #   ports:
   #     - "27017:27017"
 
-  # cassandra:
-  #   container_name: cassandra
-  #   build:
-  #     context: ./Docker/cassandra/.
-  #   image: cassandra
-  #   hostname: cassandra
-  #   networks:
-  #     - network
-  #   restart: always
-  #   ports:
-  #     - "9042:9042"
+  cassandra:
+    container_name: cassandra
+    build:
+      context: ./Docker/cassandra/.
+    image: cassandra
+    hostname: cassandra
+    networks:
+      - network
+    restart: always
+    ports:
+      - "9042:9042"
+    volumes:
+      - cassandra-data:/var/lib/cassandra
 
 
   #####################################################################
-  # 💤 SPARK — DESACTIVADO (ACTIVAR PARA BATCH PROCESSING)
+  # ✅ SPARK — ACTIVADO
   #####################################################################
+  spark-master:
+    container_name: spark-master
+    build:
+      context: ./Docker/spark/.
+    image: spark
+    hostname: spark-master
+    networks:
+      - network
+    restart: always
+    ports:
+      - "7077:7077"
+      - "8081:8080"
+    environment:
+      SPARK_MODE: master
 
-  # spark-master:
-  #   container_name: spark-master
-  #   build:
-  #     context: ./Docker/spark/.
-  #   image: spark
-  #   hostname: spark-master
-  #   networks:
-  #     - network
-  #   restart: always
-  #   ports:
-  #     - "7077:7077"
-  #     - "8081:8080"
-  #   environment:
-  #     SPARK_MODE: master
+  spark-worker:
+    container_name: spark-worker
+    build:
+      context: ./Docker/spark/.
+    image: spark
+    hostname: spark-worker
+    networks:
+      - network
+    restart: always
+    ports:
+      - "8082:8081"
+    environment:
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark-master:7077
+    depends_on:
+      - spark-master
 
-  # spark-worker:
-  #   container_name: spark-worker
-  #   build:
-  #     context: ./Docker/spark/.
-  #   image: spark
-  #   hostname: spark-worker
-  #   networks:
-  #     - network
-  #   restart: always
-  #   ports:
-  #     - "8082:8081"
-  #   environment:
-  #     SPARK_MODE: worker
-  #     SPARK_MASTER_URL: spark://spark-master:7077
-  #   depends_on:
-  #     - spark-master
 
 
   #####################################################################
