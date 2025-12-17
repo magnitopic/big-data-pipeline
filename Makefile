@@ -12,7 +12,7 @@ DOCKER_COMPOSE = docker-compose.yml
 all: build
 
 build:
-	@docker compose -f $(DOCKER_COMPOSE) up -d
+	@docker compose -f $(DOCKER_COMPOSE) up -d --build
 
 restart: down
 	@echo "$(GREEN)<+> STARTING CONTAINERS <+> $(COLOR_OFF)"
@@ -40,3 +40,6 @@ destroy: down remove_data
 
 re: destroy build
 	@echo "$(GREEN)<+> RESETTING CONTAINERS <+> $(COLOR_OFF)"
+spark:
+	@echo "Submitting ETL job to Spark master..."
+	docker exec -it spark-master /opt/spark/bin/spark-submit --master spark://spark-master:7077 /opt/spark-apps/pysparkConnector.py
