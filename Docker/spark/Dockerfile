@@ -21,4 +21,4 @@ COPY ./script/start-spark.sh /usr/local/bin/start-spark.sh
 RUN chmod +x /usr/local/bin/start-spark.sh
 
 USER spark
-ENTRYPOINT ["/opt/spark-apps/start-spark.sh"]
+ENTRYPOINT ["/usr/local/bin/start-spark.sh"]
