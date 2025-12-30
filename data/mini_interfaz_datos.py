@@ -22,7 +22,7 @@ while True :
     print("3) Filtra los registros por fecha y hora (LCD)")
     print("0) Salir")
     print("---------------------------------------------------")
-    input_user = input("Opcion: ")
+    input_user = int(input("Opcion: "))
     match input_user:
         case 1:
             os.system('cls' if os.name == 'nt' else 'clear') # Limpiar pantalla
@@ -45,7 +45,7 @@ while True :
             print("2) Personalizado")
             print("0) Salir")
             print("---------------------------------------------------")
-            input_user = input("Opcion: ")
+            input_user = int(input("Opcion: "))
             match input_user:
                 case 1:
                     documento_csv = "LCD_AAI0000TNCA_2023.csv"      
@@ -102,7 +102,7 @@ while True :
             print("2) Personalizado")
             print("0) Salir")
             print("---------------------------------------------------")
-            input_user = input("Opcion: ")
+            input_user = int(input("Opcion: "))
             match input_user:
                 case 1:
                     documento_csv = "weather_lcd_prueba.csv"
