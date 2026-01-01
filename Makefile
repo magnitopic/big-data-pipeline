@@ -40,6 +40,11 @@ destroy: down remove_data
 
 re: destroy build
 	@echo "$(GREEN)<+> RESETTING CONTAINERS <+> $(COLOR_OFF)"
-spark:
-	@echo "Submitting ETL job to Spark master..."
-	docker exec -it spark-master /opt/spark/bin/spark-submit --master spark://spark-master:7077 /opt/spark-apps/pysparkConnector.py
+
+historic:
+	@echo "$(GREEN)Submitting historic ETL job to Spark...$(COLOR_OFF)"
+	@docker exec -it spark-master /opt/spark/bin/spark-submit --master spark://spark-master:7077 /opt/spark-apps/pysparkConnector.py
+
+streaming:
+	@echo "$(GREEN)Starting streaming pipeline...$(COLOR_OFF)"
+	@docker exec -it spark-master /opt/spark/bin/spark-submit --master spark://spark-master:7077 --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0 /opt/spark-apps/pysparkStreamingConnector.py
