@@ -1,21 +1,26 @@
-#!/bin/bash
-set -euo pipefail
+#!/bin/sh
+set -eu
 
-# Use the official entrypoint to apply env-based config, then start Cassandra in foreground
+# Arranca Cassandra usando el entrypoint oficial
 /usr/local/bin/docker-entrypoint.sh cassandra -f &
 CASS_PID=$!
 
-# Wait for port
-echo "Waiting for Cassandra to accept connections on 9042..."
-for i in {1..30}; do
-  if /bin/nc -z localhost 9042; then
+echo "Waiting for Cassandra on 9042..."
+
+# Espera a que el puerto esté disponible
+for i in $(seq 1 30); do
+  if nc -z localhost 9042 >/dev/null 2>&1; then
+    echo "Cassandra is up"
     break
   fi
   sleep 2
 done
 
-# Initialize schema
-/opt/script/init-cassandra.sh || true
+# Ejecuta inicialización si existe
+if [ -f /opt/script/init-cassandra.sh ]; then
+  echo "Running init-cassandra.sh"
+  sh /opt/script/init-cassandra.sh || true
+fi
 
-# Wait for Cassandra
-wait ${CASS_PID}
+# Mantiene Cassandra vivo
+wait "$CASS_PID"

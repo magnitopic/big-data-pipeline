@@ -2,7 +2,7 @@ FROM cassandra:4.1
 
 USER root
 
-# Install additional tools
+# Herramientas necesarias
 RUN apt-get update && apt-get install -y \
     curl \
     procps \
@@ -11,10 +11,13 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy schema and scripts
+# Copia scripts y esquemas
 COPY script/ /opt/script/
 COPY tools/ /opt/tools/
-RUN chmod +x /opt/script/*.sh
+
+# Permisos correctos
+RUN chmod +x /opt/script/*.sh && \
+    chown -R cassandra:cassandra /opt/script /opt/tools
 
 USER cassandra
 

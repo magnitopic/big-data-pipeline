@@ -3,7 +3,6 @@ services:
     container_name: cassandra
     build:
       context: ./Docker/cassandra/.
-    image: cassandra
     hostname: cassandra
     networks:
       - network
@@ -21,7 +20,7 @@ services:
     volumes:
       - cassandra-data:/var/lib/cassandra
     healthcheck:
-      test: ["CMD", "cqlsh", "-e", "describe keyspaces"]
+      test: ["CMD-SHELL", "cqlsh localhost 9042 -e 'describe keyspaces' || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -80,27 +79,21 @@ services:
     volumes:
       - zookeeper-data:/var/lib/zookeeper/data
       - zookeeper-logs:/var/lib/zookeeper/log
-
+  
   spark-master:
     container_name: spark-master
     build:
-      context: ./Docker/spark/.
-    image: spark
+      context: ./Docker/spark
     hostname: spark-master
     networks:
       - network
-    entrypoint: ["/usr/local/bin/start-spark.sh"]
     restart: always
     env_file: .env
     ports:
-      - "7077:7077" # Spark master port
-      - "8081:8080" # Spark master web UI
+      - "7077:7077"
+      - "8081:8080"
     environment:
       SPARK_MODE: master
-      SPARK_RPC_AUTHENTICATION_ENABLED: "no"
-      SPARK_RPC_ENCRYPTION_ENABLED: "no"
-      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: "no"
-      SPARK_SSL_ENABLED: "no"
     volumes:
       - ./src:/opt/spark-apps
       - spark-data:/opt/spark-data
@@ -109,35 +102,24 @@ services:
   spark-worker:
     container_name: spark-worker
     build:
-      context: ./Docker/spark/.
-    image: spark
+      context: ./Docker/spark
     hostname: spark-worker
     networks:
       - network
     restart: always
     env_file: .env
     ports:
-      - "8082:8081" # Spark worker web UI
+      - "8082:8081"
     environment:
       SPARK_MODE: worker
       SPARK_MASTER_URL: spark://spark-master:7077
-      SPARK_WORKER_MEMORY: ${SPARK_WORKER_MEMORY:-2G}
-      SPARK_WORKER_CORES: ${SPARK_WORKER_CORES:-2}
-      SPARK_RPC_AUTHENTICATION_ENABLED: "no"
-      SPARK_RPC_ENCRYPTION_ENABLED: "no"
-      SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: "no"
-      SPARK_SSL_ENABLED: "no"
     volumes:
       - ./src:/opt/spark-apps
       - spark-data:/opt/spark-data
       - ./data:/data
-    entrypoint: ["/usr/local/bin/start-spark.sh"]
     depends_on:
       - spark-master
 
-    # hdfs-namenode: removed
-
-    # hdfs-datanode: removed
 
 volumes:
   nifi-conf:
