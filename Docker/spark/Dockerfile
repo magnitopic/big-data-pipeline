@@ -32,9 +32,11 @@ RUN mkdir -p /home/spark/.ivy2/cache && \
     chown -R spark:spark /home/spark && \
     chown -R spark:spark /opt/spark-data
 
-# Copy initialization script to a non-shadowed path
-COPY ./script/start-spark.sh /usr/local/bin/start-spark.sh
-RUN chmod +x /usr/local/bin/start-spark.sh
+# Copy initialization script to a non-shadowed path and ensure correct ownership
+COPY --chown=spark:spark ./script/start-spark.sh /usr/local/bin/start-spark.sh
+# Normalize CRLF -> LF for Windows-built files and make executable
+RUN sed -i 's/\r$//' /usr/local/bin/start-spark.sh && \
+    chmod +x /usr/local/bin/start-spark.sh
 
 USER spark
 ENTRYPOINT ["/usr/local/bin/start-spark.sh"]
