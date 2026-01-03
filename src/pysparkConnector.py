@@ -19,9 +19,9 @@ CASSANDRA_PORT = os.getenv("CASSANDRA_PORT", "9042")
 CASSANDRA_KEYSPACE = os.getenv("CASSANDRA_KEYSPACE", "flight_weather_historic")
 
 # Data paths
-# Default to container path "/data"; allow override for local WSL runs via env.
+# Default to container path
 DATA_DIR = os.getenv("DATA_DIR", "/data")
-AIRLINE_DELAY_FILE = f"{DATA_DIR}/Airline_Delay_Cause.csv"
+AIRLINE_DELAY_FILE = f"{DATA_DIR}/flights_delay.csv"
 DELAYS_AGG_FILE = f"{DATA_DIR}/delays_history_agg.csv"
 DELAYS_SAMPLE_FILE = f"{DATA_DIR}/delays_history_sample.csv"
 
