@@ -233,8 +233,8 @@ def process_weather_stream(spark):
         col("wind.speed").cast("float").alias("wind_speed"),
         col("wind.deg").cast("int").alias("wind_deg"),
         col("wind.gust").cast("float").alias("wind_gust"),
-        col("rain.1h").cast("float").alias("rain_1h"),
-        col("snow.1h").cast("float").alias("snow_1h"),
+        col("rain.`1h`").cast("float").alias("rain_1h"),
+        col("snow.`1h`").cast("float").alias("snow_1h"),
         col("weather").getItem(0).getField("main").cast(
             "string").alias("weather_main"),
         col("weather").getItem(0).getField("description").cast(
@@ -274,22 +274,19 @@ def main():
     spark.sparkContext.setLogLevel("WARN")
 
     try:
-        # Start both streaming queries
-        flights_query = process_flights_stream(spark)
+        # Start streaming queries
         weather_query = process_weather_stream(spark)
 
         print("\n" + "=" * 60)
         print("STREAMING PIPELINE STARTED SUCCESSFULLY")
         print("=" * 60)
         print(f"\nKafka Topics:")
-        print(f"  - {FLIGHTS_TOPIC} → flights_rt")
         print(f"  - {WEATHER_TOPIC} → weather_rt")
         print(f"\nCassandra Keyspace: {CASSANDRA_KEYSPACE}")
         print(f"Kafka Brokers: {KAFKA_BOOTSTRAP_SERVERS}")
         print("\nPress Ctrl+C to stop the streaming pipeline...")
 
-        # Wait for termination of both queries
-        flights_query.awaitTermination()
+        # Wait for termination
         weather_query.awaitTermination()
 
     except KeyboardInterrupt:
