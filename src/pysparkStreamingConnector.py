@@ -20,7 +20,7 @@ CASSANDRA_PORT = os.getenv("CASSANDRA_PORT", "9042")
 CASSANDRA_KEYSPACE = os.getenv("CASSANDRA_KEYSPACE_STREAMING", "flight_weather_streaming")
 
 # Kafka configuration
-KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:29092")
+KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:9092")
 FLIGHTS_TOPIC = os.getenv("FLIGHTS_KAFKA_TOPIC", "flights_raw")
 WEATHER_TOPIC = os.getenv("WEATHER_KAFKA_TOPIC", "weather_raw")
 
@@ -250,7 +250,6 @@ def main():
         print("\nPress Ctrl+C to stop the streaming pipeline...")
         
         # Wait for termination of both queries
-        flights_query.awaitTermination()
         weather_query.awaitTermination()
         
     except KeyboardInterrupt:
