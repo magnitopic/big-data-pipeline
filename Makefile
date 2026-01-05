@@ -43,7 +43,7 @@ re: destroy build
 
 historic:
 	@echo "$(GREEN)Submitting historic ETL job to Spark...$(COLOR_OFF)"
-	@docker exec -it spark-master /opt/spark/bin/spark-submit --master spark://spark-master:7077 /opt/spark-apps/pysparkConnector.py
+	@docker exec -it spark-master /opt/spark/bin/spark-submit --master spark://spark-master:7077 /opt/spark-apps/pysparkHistoricConnector.py
 
 streaming:
 	@echo "$(GREEN)Starting streaming pipeline...$(COLOR_OFF)"
