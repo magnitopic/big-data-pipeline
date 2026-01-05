@@ -39,10 +39,28 @@ services:
     networks:
       - network
 
+  zookeeper:
+    container_name: zookeeper
+    image: confluentinc/cp-zookeeper:7.5.0
+    hostname: zookeeper
+    networks:
+      - network
+    restart: always
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper-data:/var/lib/zookeeper/data
+      - zookeeper-logs:/var/lib/zookeeper/log
+
   kafka:
     container_name: kafka
     image: confluentinc/cp-kafka:7.5.0
     hostname: kafka
+    depends_on:
+      - zookeeper
     networks:
       - network
     restart: always
@@ -59,25 +77,22 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
     volumes:
       - kafka-data:/var/lib/kafka/data
-    depends_on:
-      - zookeeper
 
-  zookeeper:
-    container_name: zookeeper
-    image: confluentinc/cp-zookeeper:7.5.0
-    hostname: zookeeper
+  kafka-rest:
+    container_name: kafka-rest
+    image: confluentinc/cp-kafka-rest:7.5.0
+    hostname: kafka-rest
+    depends_on:
+      - kafka
     networks:
       - network
     restart: always
     ports:
-      - "2181:2181"
+      - "8083:8082"
     environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    volumes:
-      - zookeeper-data:/var/lib/zookeeper/data
-      - zookeeper-logs:/var/lib/zookeeper/log
-  
+      KAFKA_REST_BOOTSTRAP_SERVERS: "PLAINTEXT://kafka:9092"
+      KAFKA_REST_LISTENERS: "http://0.0.0.0:8082"
+
   spark-master:
     container_name: spark-master
     build:
