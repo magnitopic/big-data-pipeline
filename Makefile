@@ -12,7 +12,7 @@ DOCKER_COMPOSE = docker-compose.yml
 all: build
 
 build:
-	@docker compose -f $(DOCKER_COMPOSE) up -d --build
+	@docker compose up -d --build
 
 restart: down
 	@echo "$(GREEN)<+> STARTING CONTAINERS <+> $(COLOR_OFF)"

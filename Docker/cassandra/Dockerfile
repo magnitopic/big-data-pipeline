@@ -16,9 +16,13 @@ COPY script/ /opt/script/
 COPY tools/ /opt/tools/
 
 # Permisos correctos
-RUN chmod +x /opt/script/*.sh && \
+RUN sed -i 's/\r$//' /opt/script/*.sh && \
+    chmod +x /opt/script/*.sh && \
     chown -R cassandra:cassandra /opt/script /opt/tools
 
 USER cassandra
 
-ENTRYPOINT ["/opt/script/start.sh"]
+SHELL ["/bin/bash", "-c"]
+
+# Use absolute bash path to ensure bash is used (avoids /bin/sh running script)
+ENTRYPOINT ["/bin/bash", "-c", "exec /opt/script/start.sh"]
