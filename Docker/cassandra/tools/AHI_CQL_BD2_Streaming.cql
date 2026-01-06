@@ -18,7 +18,7 @@ CREATE TABLE flights_rt (
     PRIMARY KEY ((icao24), time_position)
 ) WITH CLUSTERING ORDER BY (time_position DESC);
 
-CREATE TABLE IF NOT EXISTS weather_rt (
+CREATE TABLE weather_rt (
     lat float,
     lon float,
     dt timestamp,
