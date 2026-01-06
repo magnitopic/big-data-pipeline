@@ -1,17 +1,17 @@
-#!/bin/bash
-set -e
+#!/bin/sh
+set -eu
 
-echo "⏳ Waiting for Cassandra on port 9042..."
+echo "⏳ Waiting for Cassandra to accept CQL..."
 
-for i in {1..40}; do
-  if nc -z localhost 9042 >/dev/null 2>&1; then
+for i in $(seq 1 60); do
+  if cqlsh localhost 9042 -e "DESCRIBE KEYSPACES;" >/dev/null 2>&1; then
     break
   fi
   sleep 2
 done
 
-if ! nc -z localhost 9042 >/dev/null 2>&1; then
-  echo "❌ Cassandra not ready after timeout"
+if ! cqlsh localhost 9042 -e "DESCRIBE KEYSPACES;" >/dev/null 2>&1; then
+  echo "❌ Cassandra not ready"
   exit 1
 fi
 
@@ -21,4 +21,4 @@ cqlsh -f /opt/tools/AHI_CQL_BD1_Historico.cql
 echo "📡 Creating streaming schema..."
 cqlsh -f /opt/tools/AHI_CQL_BD2_Streaming.cql
 
-echo "🎯 Cassandra schemas initialized successfully!"
+echo "🎯 Cassandra schema initialized successfully!"
