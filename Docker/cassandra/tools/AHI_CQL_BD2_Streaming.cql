@@ -21,7 +21,7 @@ CREATE TABLE flights_rt (
 CREATE TABLE IF NOT EXISTS weather_rt (
     lat float,
     lon float,
-    dt date,
+    dt timestamp,
     temp float,
     humidity int,
     clouds int,
