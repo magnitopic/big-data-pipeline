@@ -17,7 +17,7 @@ def main():
     df = spark.read \
         .option("header", "true") \
         .option("inferSchema", "true") \
-        .csv("data/delays_history_agg.csv")
+        .csv("/data/delays_history_agg.csv")
 
     print("Schema original:")
     df.printSchema()
@@ -82,17 +82,17 @@ def main():
     airport_kpi.coalesce(1) \
         .write.mode("overwrite") \
         .option("header", "true") \
-        .csv("output/airport_kpi")
+        .csv("/data/output/airport_kpi")
 
     carrier_kpi.coalesce(1) \
         .write.mode("overwrite") \
         .option("header", "true") \
-        .csv("output/carrier_kpi")
+        .csv("/data/output/carrier_kpi")
 
     weather_kpi.coalesce(1) \
         .write.mode("overwrite") \
         .option("header", "true") \
-        .csv("output/weather_kpi")
+        .csv("/data/output/weather_kpi")
 
     print("✔ Job Spark finalizado correctamente")
 

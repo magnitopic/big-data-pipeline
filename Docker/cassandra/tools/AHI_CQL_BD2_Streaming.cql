@@ -3,25 +3,25 @@ WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
 
 USE flight_weather_streaming;
 
-CREATE TABLE IF NOT EXISTS flights_rt (
+CREATE TABLE flights_rt (
     icao24 text,
-    time_position date,
+    time_position timestamp,
     callsign text,
     origin_country text,
-    longitude float,
-    latitude float,
-    baro_altitude float,
+    longitude double,
+    latitude double,
+    baro_altitude double,
     on_ground boolean,
-    velocity float,
-    true_track float,
-    geo_altitude float,
+    velocity double,
+    true_track double,
+    geo_altitude double,
     PRIMARY KEY ((icao24), time_position)
 ) WITH CLUSTERING ORDER BY (time_position DESC);
 
-CREATE TABLE IF NOT EXISTS weather_rt (
+CREATE TABLE weather_rt (
     lat float,
     lon float,
-    dt date,
+    dt timestamp,
     temp float,
     humidity int,
     clouds int,

@@ -47,4 +47,5 @@ historic:
 
 streaming:
 	@echo "$(GREEN)Starting streaming pipeline...$(COLOR_OFF)"
-	@docker exec -it spark-master /opt/spark/bin/spark-submit --master spark://spark-master:7077 --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0 /opt/spark-apps/pysparkStreamingConnector.py
+	@docker exec -it spark-master /opt/spark/bin/spark-submit --master spark://spark-master:7077 --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0,com.datastax.spark:spark-cassandra-connector_2.12:3.5.1 /opt/spark-apps/flights_streaming.py
+	@docker exec -it spark-master /opt/spark/bin/spark-submit --master spark://spark-master:7077 --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0,com.datastax.spark:spark-cassandra-connector_2.12:3.5.1 /opt/spark-apps/weather_streaming.py
