@@ -55,8 +55,8 @@ raw = spark.readStream.format("kafka") \
     .option("startingOffsets", "latest") \
     .load()
 
-parsed = raw.selectExpr("CAST(value AS STRING) as json") \
-    .select(from_json(col("json"), schema).alias("w"))
+parsed = raw.selectExpr("CAST(value AS STRING) as raw_json") \
+    .select(from_json(col("raw_json"), schema).alias("w"))
 
 clean = parsed.select(
     col("w.coord.lat").alias("lat"),
@@ -76,6 +76,12 @@ clean = parsed.select(
 ).filter(col("lat").isNotNull())
 
 def write_to_cassandra(batch_df, batch_id):
+    if batch_df.rdd.isEmpty():
+        print("⚠️ Batch vacío")
+        return
+
+    batch_df.show(truncate=False)
+
     batch_df.write \
         .format("org.apache.spark.sql.cassandra") \
         .option("keyspace", CASSANDRA_KEYSPACE) \
@@ -88,5 +94,5 @@ query = clean.writeStream \
     .foreachBatch(write_to_cassandra) \
     .option("checkpointLocation", "/opt/spark-data/checkpoints/weather") \
     .start()
-
+    
 query.awaitTermination()

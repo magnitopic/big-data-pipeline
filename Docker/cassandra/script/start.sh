@@ -1,8 +1,13 @@
 #!/bin/sh
-set -eu
+set -e
 
-# Lanza la inicialización en segundo plano
-/opt/script/init-cassandra.sh &
+echo "🚀 Starting Cassandra..."
+/usr/local/bin/docker-entrypoint.sh cassandra -f &
 
-# Arranca Cassandra como proceso principal
-exec "$@"
+CASS_PID=$!
+
+echo "⏳ Waiting Cassandra bootstrap..."
+/opt/script/init-cassandra.sh
+
+echo "✅ Cassandra ready, handing over control"
+wait ${CASS_PID}
