@@ -39,4 +39,8 @@ RUN sed -i 's/\r$//' /usr/local/bin/start-spark.sh && \
     chmod +x /usr/local/bin/start-spark.sh
 
 USER spark
-ENTRYPOINT ["/usr/local/bin/start-spark.sh"]
+
+SHELL ["/bin/bash", "-c"]
+
+# Use absolute bash path for robustness
+ENTRYPOINT ["/bin/bash", "-c", "exec /usr/local/bin/start-spark.sh"]
