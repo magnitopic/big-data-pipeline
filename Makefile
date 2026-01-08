@@ -45,6 +45,10 @@ historic:
 	@echo "$(GREEN)Submitting historic ETL job to Spark...$(COLOR_OFF)"
 	@docker exec -it spark-master /opt/spark/bin/spark-submit --master spark://spark-master:7077 /opt/spark-apps/pysparkHistoricConnector.py
 
+weather-data:
+	@echo "$(GREEN)Submitting weather station ETL job to Spark...$(COLOR_OFF)"
+	@docker exec -it spark-master /opt/spark/bin/spark-submit --master spark://spark-master:7077 /opt/spark-apps/weatherDataHandler.py
+
 streaming:
 	@echo "$(GREEN)Starting streaming pipeline...$(COLOR_OFF)"
 	@docker exec -it spark-master /opt/spark/bin/spark-submit --master spark://spark-master:7077 --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0,com.datastax.spark:spark-cassandra-connector_2.12:3.5.1 /opt/spark-apps/flights_streaming.py
