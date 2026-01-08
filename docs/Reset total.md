@@ -32,6 +32,10 @@ kafka-topics --bootstrap-server kafka:9092 --create --topic openweather.usa.raw 
 
 **3. NiFi – Arrancar flujos**
 
+docker exec -it kafka kafka-console-consumer --bootstrap-server kafka:9092 --topic opensky.usa.raw
+
+docker exec -it kafka kafka-console-consumer --bootstrap-server kafka:9092 --topic openweather.usa.raw
+
 **4. Spark – Arrancar .py**
 
 docker exec -it spark-master /opt/spark/bin/spark-submit --master spark://spark-master:7077 --executor-cores 6 --total-executor-cores 6 --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0,com.datastax.spark:spark-cassandra-connector_2.12:3.5.1 /opt/spark-apps/flights_streaming.py
